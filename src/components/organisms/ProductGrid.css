@@ -1,0 +1,7 @@
+/* src/components/3-organisms/ProductGrid.css */
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 25px;
+  padding: 20px 0;
+}

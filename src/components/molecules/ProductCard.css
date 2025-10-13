@@ -1,0 +1,34 @@
+/* src/components/2-molecules/ProductCard.css */
+.product-card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 16px;
+  text-align: center;
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.product-card a {
+    text-decoration: none;
+    color: inherit;
+}
+
+.product-card-image {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    margin-bottom: 12px;
+}
+
+.product-card-price {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #28a745;
+    margin: 10px 0;
+}

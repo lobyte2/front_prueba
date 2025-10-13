@@ -1,0 +1,14 @@
+/* src/components/templates/MainLayout.css */
+.main-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* Asegura que el footer se mantenga abajo */
+}
+
+.main-content {
+  flex-grow: 1; /* Permite que el contenido principal ocupe el espacio disponible */
+  padding: 20px 40px; /* Añade algo de espacio alrededor del contenido */
+  width: 100%;
+  max-width: 1400px; /* Limita el ancho máximo para pantallas grandes */
+  margin: 0 auto; /* Centra el contenido */
+}
