@@ -15,6 +15,10 @@
   color: #ffffff;
 }
 
+.logo:hover {
+    color: #9cffa9;
+}
+
 .main-nav a {
   margin: 0 15px;
   color: white;
