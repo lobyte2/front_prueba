@@ -1,25 +1,22 @@
 // src/api/db.js
 
 const products = [
-    { id: 1, name: "Control Xbox", price: 59990, image: "/img/xbox.webp", description: "Control inalámbrico de Xbox con diseño ergonómico y vibración háptica." },
+    { id: 1, name: "Control Xbox", price: 59000, image: "/img/xbox.webp", description: "Control inalámbrico de Xbox con diseño ergonómico y vibración háptica." },
     { id: 2, name: "Auriculares Logitech", price: 60000, image: "/img/logi.jpeg", description: "Auriculares Logitech con micrófono incorporado y sonido envolvente." },
     { id: 3, name: "Escritorio Cougar", price: 150000, image: "/img/cougar.avif", description: "Escritorio gamer Cougar con superficie amplia y soporte para accesorios." },
     { id: 4, name: "Teclado HyperX", price: 49990, image: "/img/teclado.jpg", description: "Teclado mecánico HyperX con retroiluminación RGB y switches precisos." },
     { id: 5, name: "Mouse Glorious", price: 24990, image: "/img/glorious.jpg", description: "Mouse Glorious ultraligero con sensor de alta precisión y diseño perforado." },
-    { id: 6, name: "Monitor 24\"", price: 159990, image: "/img/monitor.jpg", description: "Monitor de 24 pulgadas Full HD con alta tasa de refresco y bordes delgados, ideal para videojuegos." },
+    { id: 6, name: "Monitor 24\"", price: 159990, image: "/img/monitor.jpg", description: "Monitor de 24 pulgadas Full HD con alta tasa de refresco y bordes delgados." },
     { id: 7, name: "Silla Gamer", price: 89990, image: "/img/silla.jpg", description: "Silla gamer ergonómica con soporte lumbar y ajuste de altura reclinable." },
-    { id: 8, name: "Control PlayStation 4", price: 69990, image: "/img/ps4 mando.webp", description: "Control inalámbrico de PlayStation con diseño ergonómico y retroalimentación háptica." },
-    { id: 9, name: "Audifonos Logitech G733", price: 137990, image: "/img/g733.png", description: "Audífonos Logitech G733 con sonido de alta calidad y micrófono desmontable." },
-    { id: 10, name: "Mouse Attack Shark x3", price: 26000, image: "/img/x3.jpg", description: "Mouse Attack Shark x3 con diseño ergonómico y sensor de alta precisión, liviano y comodo al usar." },
 ];
 
-// Da formato de peso chileno a un número.
+// Da formato de peso chileno a un número, sin decimales.
 export function money(x) {
-  return Intl.NumberFormat("es-CL", {
-     style: "currency",
-     currency: "CLP",
-    minimumFractionDigits: 0,
- }).format(x);
+  return Intl.NumberFormat("es-CL", { 
+    style: "currency", 
+    currency: "CLP",
+    minimumFractionDigits: 0
+  }).format(x);
 }
 
 let users = [
@@ -30,6 +27,23 @@ let users = [
 // --- Funciones de Productos ---
 export const getProducts = () => new Promise(resolve => setTimeout(() => resolve(products), 200));
 export const getProductById = (id) => new Promise(resolve => setTimeout(() => resolve(products.find(p => p.id === parseInt(id))), 200));
+
+// Agrega un nuevo producto a la lista.
+export const addProduct = (productData) => {
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            const newProduct = {
+                id: products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1,
+                name: productData.name,
+                price: parseFloat(productData.price),
+                image: productData.image,
+                description: productData.description,
+            };
+            products.push(newProduct);
+            resolve([...products]);
+        }, 300);
+    });
+};
 
 // --- Funciones de Autenticación (Login y Registro) ---
 export const loginUser = ({ email, password }) => {
@@ -79,7 +93,6 @@ export const deleteUser = (userId) => {
         }, 300);
     });
 };
-// validaciones de contraseña y correo
 export const addUser = ({ email, password }) => {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
