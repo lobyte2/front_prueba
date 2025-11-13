@@ -1,21 +1,125 @@
-const products = [
-    { id: 1, name: "Control Xbox", price: 59000, image: "/img/xbox.webp", description: "Control inalámbrico de Xbox con diseño ergonómico y vibración háptica." },
-    { id: 2, name: "Auriculares Logitech", price: 60000, image: "/img/logi.jpeg", description: "Auriculares Logitech con micrófono incorporado y sonido envolvente." },
-    { id: 3, name: "Escritorio Cougar", price: 150000, image: "/img/cougar.avif", description: "Escritorio gamer Cougar con superficie amplia y soporte para accesorios." },
-    { id: 4, name: "Teclado HyperX", price: 49990, image: "/img/teclado.jpg", description: "Teclado mecánico HyperX con retroiluminación RGB y switches precisos." },
-    { id: 5, name: "Mouse Glorious", price: 24990, image: "/img/glorious.jpg", description: "Mouse Glorious ultraligero con sensor de alta precisión y diseño perforado." },
-    { id: 6, name: "Monitor 24\"", price: 159990, image: "/img/monitor.jpg", description: "Monitor de 24 pulgadas Full HD con alta tasa de refresco y bordes delgados." },
-    { id: 7, name: "Silla Gamer", price: 89990, image: "/img/silla.jpg", description: "Silla gamer ergonómica con soporte lumbar y ajuste de altura reclinable." },
-    { id: 8, name: "Attack Shark x3", price: 20990, image: "/img/x3.jpg", description: "Mouse gamer Attack Shark x3 con sensor de alta precisión, diseño ergonómico y cómodo de usar." },
-    { id: 9, name: "Mando PlayStation 4", price: 50990, image: "/img/ps4 mando.webp", description: "Mando inalámbrico de PlayStation con diseño ergonómico y retroalimentación háptica." },
-    { id: 10, name: "Logitech G733", price: 125900, image: "/img/g733.png", description: "Auriculares Logitech G733 con sonido envolvente y micrófono desmontable."},
-    { id: 11, name: "Almacenamiento SSD m.2", price: 69990, image: "/img/m.2.jpg", description: "Almacenamiento SSD m.2 de alta velocidad y gran capacidad."},
-    { id: 12, name: "Fuente de poder EVGA", price: 150990, image: "/img/fuente.jpg", description: "Fuente de poder EVGA de alta eficiencia e alto rendimiento."},
-    { id: 13, name: "Tarjeta de video NVIDIA GeForce RTX 4060", price: 365000, image: "/img/4060.jpg", description: "Tarjeta de video NVIDIA GeForce RTX 4060 con 8GB de VRAM y soporte para Ray Tracing."},
-    { id: 14, name: "Almacenamiento SSD Kingston 480 GB", price: 45000, image: "/img/ssd.jpg", description: "Almacenamiento SSD Kingston de alta velocidad y gran capacidad, facil de instalar."},
-];
+// La URL de mi portal (Gateway)
+const API_URL = 'http://localhost:3000/api';
 
+// --- Helpers ---
 
+// Helper para manejar la respuesta del fetch
+const handleResponse = async (response) => {
+    const data = await response.json();
+    if (!response.ok) {
+        throw (data.message || data || 'Error desconocido del servidor');
+    }
+    return data;
+};
+
+// Helper para mandar el ID del usuario (para el carrito)
+const getAuthHeaders = () => {
+    const headers = {
+        'Content-Type': 'application/json',
+    };
+    try {
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+            const user = JSON.parse(storedUser);
+            headers['x-user-id'] = user.id;
+        }
+    } catch (e) {
+        // No hacer nada si falla, solo no se manda el header
+    }
+    return headers;
+};
+
+// --- Productos (product-service) ---
+
+export const getProducts = () => {
+    return fetch(`${API_URL}/products`).then(handleResponse);
+};
+
+export const getProductById = (id) => {
+    return fetch(`${API_URL}/products/${id}`).then(handleResponse);
+};
+
+export const addProduct = (productData) => {
+    return fetch(`${API_URL}/products`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(productData),
+    }).then(handleResponse);
+};
+
+// --- Login / Registro (login-service) ---
+
+export const loginUser = ({ email, password }) => {
+    return fetch(`${API_URL}/login/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+    }).then(handleResponse);
+};
+
+export const registerUser = (userData) => {
+    return fetch(`${API_URL}/login/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(userData),
+    }).then(handleResponse);
+};
+
+// --- Admin Usuarios (user-service) ---
+
+export const getUsers = () => {
+    return fetch(`${API_URL}/users`, {
+        headers: getAuthHeaders()
+    }).then(handleResponse);
+};
+
+export const deleteUser = (userId) => {
+    return fetch(`${API_URL}/users/${userId}`, {
+        method: 'DELETE',
+        headers: getAuthHeaders()
+    }).then(handleResponse);
+};
+
+export const addUser = ({ email, password }) => {
+    return fetch(`${API_URL}/users`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ email, password }),
+    }).then(handleResponse);
+};
+
+// --- Carrito (cart-service) ---
+
+export const getCart = () => {
+    return fetch(`${API_URL}/cart`, {
+        headers: getAuthHeaders() // Obligatorio
+    }).then(handleResponse);
+};
+
+export const addToCartApi = (product) => {
+    return fetch(`${API_URL}/cart/itemlo`, { // Endpoint del backend
+        method: 'POST',
+        headers: getAuthHeaders(), // Obligatorio
+        body: JSON.stringify(product)
+    }).then(handleResponse);
+};
+
+export const removeFromCartApi = (productId) => {
+    return fetch(`${API_URL}/cart/itemlo/${productId}`, { // Endpoint del backend
+        method: 'DELETE',
+        headers: getAuthHeaders() // Obligatorio
+    }).then(handleResponse);
+};
+
+// --- Blog (blog-service) ---
+
+export const getBlogPosts = () => {
+    return fetch(`${API_URL}/blog/posteos`).then(handleResponse); // Endpoint del backend
+};
+
+// --- Utilidad (Local) ---
+
+// Dejo esta función porque la sigo usando en el frontend
 export function money(x) {
   return Intl.NumberFormat("es-CL", { 
     style: "currency", 
@@ -23,97 +127,3 @@ export function money(x) {
     minimumFractionDigits: 0
   }).format(x);
 }
-
-let users = [
-    { id: 1, email: 'roro@duoc.cl', password: 'admin', role: 'admin', fullName: 'Admin Roro', phone: 'N/A', region: 'N/A' },
-    { id: 2, email: 'user@test.com', password: 'user123', role: 'user', fullName: 'Usuario Test', phone: '987654321', region: 'Los Lagos' },
-];
-
-
-export const getProducts = () => new Promise(resolve => setTimeout(() => resolve(products), 200));
-export const getProductById = (id) => new Promise(resolve => setTimeout(() => resolve(products.find(p => p.id === parseInt(id))), 200));
-
-
-export const addProduct = (productData) => {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            const newProduct = {
-                id: products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1,
-                name: productData.name,
-                price: parseFloat(productData.price),
-                image: productData.image,
-                description: productData.description,
-            };
-            products.push(newProduct);
-            resolve([...products]);
-        }, 300);
-    });
-};
-
-
-export const loginUser = ({ email, password }) => {
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            if (!password || password.length < 5 || password.length > 15) {
-                return reject('La contraseña debe tener entre 5 y 15 caracteres');
-            }
-            const user = users.find(u => u.email === email && u.password === password);
-            if (user) {
-                resolve({ id: user.id, email: user.email, role: user.role });
-            } else {
-                reject('Credenciales inválidas');
-            }
-        }, 500);
-    });
-};
-
-export const registerUser = (userData) => {
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            const { email, password, fullName, phone, region } = userData;
-            if (!password || password.length < 5 || password.length > 15) {
-                return reject('La contraseña debe tener entre 5 y 15 caracteres');
-            }
-            if (users.some(u => u.email === email)) {
-                return reject('El correo ya está registrado');
-            }
-            const newUser = {
-                id: users.length > 0 ? Math.max(...users.map(u => u.id)) + 1 : 1,
-                email, password, role: 'user', fullName,
-                phone: phone || 'No especificado', region,
-            };
-            users.push(newUser);
-            resolve({ id: newUser.id, email: newUser.email, role: newUser.role });
-        }, 500);
-    });
-};
-
-
-export const getUsers = () => new Promise(resolve => setTimeout(() => resolve(users), 200));
-export const deleteUser = (userId) => {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            users = users.filter(u => u.id !== userId);
-            resolve(users);
-        }, 300);
-    });
-};
-export const addUser = ({ email, password }) => {
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            if (!password || password.length < 5 || password.length > 15) {
-                return reject('La contraseña debe tener entre 5 y 15 caracteres');
-            }
-            if (users.some(u => u.email === email)) {
-                return reject('El correo ya existe');
-            }
-            const newUser = {
-                id: users.length > 0 ? Math.max(...users.map(u => u.id)) + 1 : 1,
-                email, password, role: 'user', fullName: 'Nuevo Usuario',
-                phone: 'N/A', region: 'N/A'
-            };
-            users.push(newUser);
-            resolve(users);
-        }, 300);
-    });
-};

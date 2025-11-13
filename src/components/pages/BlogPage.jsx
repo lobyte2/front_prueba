@@ -1,8 +1,13 @@
+import { useState, useEffect } from 'react';
 import MainLayout from '../templates/MainLayout';
 import Heading from '../atoms/Heading';
 import Text from '../atoms/Text';
+import { getBlogPosts } from '../../api/db';
 
 const BlogPage = () => {
+    const [posts, setPosts] = useState([]);
+    const [loading, setLoading] = useState(true);
+
     const sectionStyle = {
         marginBottom: '40px',
         padding: '20px',
@@ -19,47 +24,60 @@ const BlogPage = () => {
         borderRadius: '8px'
     };
 
+    // Cargar los posteos de la API
+    useEffect(() => {
+        setLoading(true);
+        getBlogPosts()
+            .then(setPosts)
+            .catch(err => console.error("Error al cargar el blog:", err))
+            .finally(() => setLoading(false));
+    }, []); 
+
+    if (loading) {
+        return (
+            <MainLayout>
+                <Heading level={1} style={{ textAlign: 'center', marginBottom: '40px' }}>Blog</Heading>
+                <Text style={{ textAlign: 'center' }}>Cargando posteos...</Text>
+            </MainLayout>
+        );
+    }
+
     return (
         <MainLayout>
             <div style={{ maxWidth: '800px', margin: '40px auto' }}>
                 <Heading level={1} style={{ textAlign: 'center', marginBottom: '40px' }}>Blog</Heading>
 
-
+                {/* Sección Novedades */}
                 <div style={sectionStyle}>
                     <Heading level={2}>Novedades de la tienda</Heading>
-                    <Text>
-                        El SSD M.2 980 PRO de Samsung ofrece un rendimiento excepcional para gamers y profesionales. Puede alcanzar hasta velocidades de lectura hasta 7.000 MB/s y ofrece un almacenamiento de 2TB.
-                    </Text>
-                    <img 
-                        src="https://bestmart.cl/cdn/shop/files/tarjeta-ssd-samsung-500gb-980-pro-pcie-40-x4-m2-9509012_800x.jpg?v=1758551364" 
-                        alt="SSD M.2 980 PRO" 
-                        style={imageStyle} 
-                    />
+                    {posts.filter(p => p.tipo === 'novedad').map(post => (
+                        <div key={post.id}>
+                            <Text>{post.texto}</Text>
+                            <img 
+                                src={post.urlImagen} 
+                                alt={post.altImagen} 
+                                style={imageStyle} 
+                            />
+                        </div>
+                    ))}
                 </div>
 
-
+                {/* Sección Datos Curiosos */}
                 <div style={sectionStyle}>
                     <Heading level={2}>Datos curiosos</Heading>
-                    
-                    <Text>
-                        El Glorious Model O Inalámbrico puede alcanzar hasta 25.000 DPI y una carga de batería al 100% puede durar aproximadamente 71 horas con el RGB apagado.
-                    </Text>
-                    <img 
-                        src="https://hardwaremarket.net/wp-content/uploads/2021/03/1_white.jpg" 
-                        alt="Mouse Glorious Model O" 
-                        style={imageStyle} 
-                    />
-
-                    <hr style={{ margin: '40px 0', border: '1px solid #eee' }} />
-
-                    <Text>
-                        El teclado HyperX Alloy Core RGB puede resistir hasta 120 ml de líquido, lo cual lo hace muy resistente.
-                    </Text>
-                    <img 
-                        src="https://media.spdigital.cl/thumbnails/products/rv969_qx_0c03c07b_thumbnail_4096.jpg" 
-                        alt="Teclado HyperX Alloy Core RGB" 
-                        style={imageStyle} 
-                    />
+                    {posts.filter(p => p.tipo === 'dato').map((post, index, arr) => (
+                        <div key={post.id}>
+                            <Text>{post.texto}</Text>
+                            <img 
+                                src={post.urlImagen} 
+                                alt={post.altImagen} 
+                                style={imageStyle} 
+                            />
+                            {index < arr.length - 1 && (
+                                <hr style={{ margin: '40px 0', border: '1px solid #eee' }} />
+                            )}
+                        </div>
+                    ))}
                 </div>
             </div>
         </MainLayout>

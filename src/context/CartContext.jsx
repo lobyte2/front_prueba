@@ -1,53 +1,54 @@
-import { createContext, useState, useEffect } from 'react';
+import { createContext, useState, useEffect, useContext } from 'react';
+import { getCart, addToCartApi, removeFromCartApi } from '../api/db';
+import { AuthContext } from './AuthContext';
 
 export const CartContext = createContext();
 
-
-const getInitialCart = () => {
-    try {
-        const storedCart = localStorage.getItem('cart');
-
-        return storedCart ? JSON.parse(storedCart) : [];
-    } catch (error) {
-        console.error("Error al leer el carrito del localStorage", error);
-        return [];
-    }
-};
-
 export const CartProvider = ({ children }) => {
-
-    const [cart, setCart] = useState(getInitialCart);
-
+    const [cart, setCart] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const { isAuthenticated, user } = useContext(AuthContext);
 
     useEffect(() => {
-        try {
-
-            localStorage.setItem('cart', JSON.stringify(cart));
-        } catch (error) {
-            console.error("No se pudo guardar el carrito en el localStorage", error);
+        if (isAuthenticated && user) {
+            setLoading(true);
+            getCart()
+                .then(setCart)
+                .catch(err => {
+                    console.error("Error al cargar el carrito:", err.message);
+                    setCart([]);
+                })
+                .finally(() => setLoading(false));
+        } else {
+            setCart([]);
         }
-    }, [cart]);
+    }, [isAuthenticated, user]);
 
-    const addToCart = (product) => {
-        setCart(prevCart => {
-            const existingProduct = prevCart.find(item => item.id === product.id);
-            if (existingProduct) {
-
-                return prevCart.map(item =>
-                    item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
-                );
-            }
-
-            return [...prevCart, { ...product, quantity: 1 }];
-        });
+    const addToCart = async (product) => {
+        if (!isAuthenticated) {
+            alert('Debes iniciar sesión para agregar productos al carrito');
+            return;
+        }
+        try {
+            const updatedCart = await addToCartApi(product);
+            setCart(updatedCart);
+        } catch (error) {
+            console.error("Error al agregar al carrito:", error.message);
+        }
     };
 
-    const removeFromCart = (productId) => {
-        setCart(prevCart => prevCart.filter(item => item.id !== productId));
+    const removeFromCart = async (productId) => {
+        if (!isAuthenticated) return;
+        try {
+            const updatedCart = await removeFromCartApi(productId);
+            setCart(updatedCart);
+        } catch (error) {
+            console.error("Error al eliminar del carrito:", error.message);
+        }
     };
 
     return (
-        <CartContext.Provider value={{ cart, addToCart, removeFromCart }}>
+        <CartContext.Provider value={{ cart, addToCart, removeFromCart, loadingCart: loading }}>
             {children}
         </CartContext.Provider>
     );
