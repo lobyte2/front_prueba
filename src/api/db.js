@@ -5,7 +5,23 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
 // Helper para manejar la respuesta del fetch
 const handleResponse = async (response) => {
-    const data = await response.json();
+    // LOG DE DEPURACIÓN
+    console.log(`[API] Petición a: ${response.url}`);
+    console.log(`[API] Status: ${response.status}`);
+    
+    // Intentamos leer el texto primero para ver qué llega, sea JSON o error
+    const text = await response.text();
+    console.log(`[API] Respuesta cruda:`, text.substring(0, 100) + '...'); // Solo los primeros 100 caracteres
+
+    let data;
+    try {
+        data = JSON.parse(text);
+    } catch (error) {
+        // Si falla el parseo, es porque no llegó JSON
+        console.error('[API Error] No se pudo parsear JSON:', error);
+        throw new Error(`El servidor respondió con algo que no es JSON: "${text.substring(0, 50)}..."`);
+    }
+
     if (!response.ok) {
         throw (data.message || data || 'Error desconocido del servidor');
     }
