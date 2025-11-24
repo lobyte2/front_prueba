@@ -1,6 +1,6 @@
 // La URL de mi portal (Gateway)
-// *** CORREGIDO: ahora apunta al gateway con /api ***
-const API_BASE_URL = "https://back-gate.onrender.com/api";
+// Usamos la variable de entorno de Vite (correcta en Vercel)
+const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 // --- Helpers ---
 
