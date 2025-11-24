@@ -1,16 +1,13 @@
 // La URL de mi portal (Gateway)
-// REVERTIMOS A USAR LA VARIABLE DE ENTORNO VITE_API_URL
-const API_BASE_URL = import.meta.env.VITE_API_URL; 
+// *** CORREGIDO: ahora apunta al gateway con /api ***
+const API_BASE_URL = "https://back-gate.onrender.com/api";
 
 // --- Helpers ---
 
-// Helper para manejar la respuesta del fetch
 const handleResponse = async (response) => {
-    // LOG DE DEPURACIÓN
     console.log(`[API] Petición a: ${response.url}`);
     console.log(`[API] Status: ${response.status}`);
     
-    // Leemos el texto completo para el diagnóstico
     const text = await response.text();
     console.log(`[API] Respuesta cruda (inicio):`, text.substring(0, 100) + '...'); 
 
@@ -18,9 +15,7 @@ const handleResponse = async (response) => {
     try {
         data = JSON.parse(text);
     } catch (error) {
-        // El servidor NO respondió JSON (probablemente HTML de 404)
         console.error('[API Error] No se pudo parsear JSON. Contenido recibido:', text.substring(0, 100) + '...');
-        // Arroja un error claro
         throw new Error(`Error de servidor (Status ${response.status}): ${text.substring(0, 50)}...`);
     }
 
@@ -30,7 +25,6 @@ const handleResponse = async (response) => {
     return data;
 };
 
-// Helper para mandar el ID del usuario (para el carrito)
 const getAuthHeaders = () => {
     const headers = {
         'Content-Type': 'application/json',
@@ -41,17 +35,14 @@ const getAuthHeaders = () => {
             const user = JSON.parse(storedUser);
             headers['x-user-id'] = user.id;
         }
-    } catch (e) {
-        // No hacer nada si falla
-    }
+    } catch (e) {}
     return headers;
 };
 
-// --- Productos (product-service) ---
+// --- Productos ---
 
 export const getProducts = () => {
-    // AHORA API_BASE_URL DEBE SER EL VALOR COMPLETO DE LA VARIABLE DE VERCEL
-    return fetch(`${API_BASE_URL}/products`).then(handleResponse); 
+    return fetch(`${API_BASE_URL}/products`).then(handleResponse);
 };
 
 export const getProductById = (id) => {
@@ -66,7 +57,6 @@ export const addProduct = (productData) => {
     }).then(handleResponse);
 };
 
-// Nuevas funciones: Editar y Eliminar Producto
 export const updateProduct = (id, productData) => {
     return fetch(`${API_BASE_URL}/products/${id}`, {
         method: 'PUT',
@@ -78,11 +68,11 @@ export const updateProduct = (id, productData) => {
 export const deleteProduct = (id) => {
     return fetch(`${API_BASE_URL}/products/${id}`, {
         method: 'DELETE',
-        headers: getAuthHeaders(),
+        headers: getAuthHeaders()
     }).then(handleResponse);
 };
 
-// --- Login / Registro (login-service) ---
+// --- Login / Registro ---
 
 export const loginUser = ({ email, password }) => {
     return fetch(`${API_BASE_URL}/login/login`, {
@@ -100,7 +90,7 @@ export const registerUser = (userData) => {
     }).then(handleResponse);
 };
 
-// --- Admin Usuarios (user-service) ---
+// --- Admin Usuarios ---
 
 export const getUsers = () => {
     return fetch(`${API_BASE_URL}/users`, {
@@ -123,7 +113,7 @@ export const addUser = ({ email, password }) => {
     }).then(handleResponse);
 };
 
-// --- Carrito (cart-service) ---
+// --- Carrito ---
 
 export const getCart = () => {
     return fetch(`${API_BASE_URL}/cart`, {
@@ -146,7 +136,6 @@ export const removeFromCartApi = (productId) => {
     }).then(handleResponse);
 };
 
-// Nueva función: Finalizar Compra
 export const checkoutCart = () => {
     return fetch(`${API_BASE_URL}/cart/checkout`, {
         method: 'POST',
@@ -154,13 +143,13 @@ export const checkoutCart = () => {
     }).then(handleResponse);
 };
 
-// --- Blog (blog-service) ---
+// --- Blog ---
 
 export const getBlogPosts = () => {
     return fetch(`${API_BASE_URL}/blog/posteos`).then(handleResponse);
 };
 
-// --- Utilidad (Local) ---
+// --- Utilidad ---
 
 export function money(x) {
   return Intl.NumberFormat("es-CL", { 
