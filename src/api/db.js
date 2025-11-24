@@ -1,10 +1,6 @@
 // La URL de mi portal (Gateway)
-// =================================================================================
-// CORRECCIÓN FINAL DE RUTA: 
-// La URL Base NO debe incluir el '/api', ya que se agrega en cada fetch.
-// ¡DEBES REEMPLAZAR LA URL BASE CON TU URL REAL DE RENDER!
-// =================================================================================
-const API_BASE_URL = 'https://back-gate.onrender.com'; // <--- ¡SIN /api AL FINAL!
+// REVERTIMOS A USAR LA VARIABLE DE ENTORNO VITE_API_URL
+const API_BASE_URL = import.meta.env.VITE_API_URL; 
 
 // --- Helpers ---
 
@@ -54,16 +50,16 @@ const getAuthHeaders = () => {
 // --- Productos (product-service) ---
 
 export const getProducts = () => {
-    // AÑADIMOS EL PREFIJO '/api' EN EL FETCH
-    return fetch(`${API_BASE_URL}/api/products`).then(handleResponse);
+    // AHORA API_BASE_URL DEBE SER EL VALOR COMPLETO DE LA VARIABLE DE VERCEL
+    return fetch(`${API_BASE_URL}/products`).then(handleResponse); 
 };
 
 export const getProductById = (id) => {
-    return fetch(`${API_BASE_URL}/api/products/${id}`).then(handleResponse);
+    return fetch(`${API_BASE_URL}/products/${id}`).then(handleResponse);
 };
 
 export const addProduct = (productData) => {
-    return fetch(`${API_BASE_URL}/api/products`, {
+    return fetch(`${API_BASE_URL}/products`, {
         method: 'POST',
         headers: getAuthHeaders(),
         body: JSON.stringify(productData),
@@ -72,7 +68,7 @@ export const addProduct = (productData) => {
 
 // Nuevas funciones: Editar y Eliminar Producto
 export const updateProduct = (id, productData) => {
-    return fetch(`${API_BASE_URL}/api/products/${id}`, {
+    return fetch(`${API_BASE_URL}/products/${id}`, {
         method: 'PUT',
         headers: getAuthHeaders(),
         body: JSON.stringify(productData),
@@ -80,7 +76,7 @@ export const updateProduct = (id, productData) => {
 };
 
 export const deleteProduct = (id) => {
-    return fetch(`${API_BASE_URL}/api/products/${id}`, {
+    return fetch(`${API_BASE_URL}/products/${id}`, {
         method: 'DELETE',
         headers: getAuthHeaders(),
     }).then(handleResponse);
@@ -89,7 +85,7 @@ export const deleteProduct = (id) => {
 // --- Login / Registro (login-service) ---
 
 export const loginUser = ({ email, password }) => {
-    return fetch(`${API_BASE_URL}/api/login/login`, {
+    return fetch(`${API_BASE_URL}/login/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -97,7 +93,7 @@ export const loginUser = ({ email, password }) => {
 };
 
 export const registerUser = (userData) => {
-    return fetch(`${API_BASE_URL}/api/login/register`, {
+    return fetch(`${API_BASE_URL}/login/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(userData),
@@ -107,20 +103,20 @@ export const registerUser = (userData) => {
 // --- Admin Usuarios (user-service) ---
 
 export const getUsers = () => {
-    return fetch(`${API_BASE_URL}/api/users`, {
+    return fetch(`${API_BASE_URL}/users`, {
         headers: getAuthHeaders()
     }).then(handleResponse);
 };
 
 export const deleteUser = (userId) => {
-    return fetch(`${API_BASE_URL}/api/users/${userId}`, {
+    return fetch(`${API_BASE_URL}/users/${userId}`, {
         method: 'DELETE',
         headers: getAuthHeaders()
     }).then(handleResponse);
 };
 
 export const addUser = ({ email, password }) => {
-    return fetch(`${API_BASE_URL}/api/users`, {
+    return fetch(`${API_BASE_URL}/users`, {
         method: 'POST',
         headers: getAuthHeaders(),
         body: JSON.stringify({ email, password }),
@@ -130,13 +126,13 @@ export const addUser = ({ email, password }) => {
 // --- Carrito (cart-service) ---
 
 export const getCart = () => {
-    return fetch(`${API_BASE_URL}/api/cart`, {
+    return fetch(`${API_BASE_URL}/cart`, {
         headers: getAuthHeaders()
     }).then(handleResponse);
 };
 
 export const addToCartApi = (product) => {
-    return fetch(`${API_BASE_URL}/api/cart/itemlo`, {
+    return fetch(`${API_BASE_URL}/cart/itemlo`, {
         method: 'POST',
         headers: getAuthHeaders(),
         body: JSON.stringify(product)
@@ -144,7 +140,7 @@ export const addToCartApi = (product) => {
 };
 
 export const removeFromCartApi = (productId) => {
-    return fetch(`${API_BASE_URL}/api/cart/itemlo/${productId}`, {
+    return fetch(`${API_BASE_URL}/cart/itemlo/${productId}`, {
         method: 'DELETE',
         headers: getAuthHeaders()
     }).then(handleResponse);
@@ -152,7 +148,7 @@ export const removeFromCartApi = (productId) => {
 
 // Nueva función: Finalizar Compra
 export const checkoutCart = () => {
-    return fetch(`${API_BASE_URL}/api/cart/checkout`, {
+    return fetch(`${API_BASE_URL}/cart/checkout`, {
         method: 'POST',
         headers: getAuthHeaders(),
     }).then(handleResponse);
@@ -161,7 +157,7 @@ export const checkoutCart = () => {
 // --- Blog (blog-service) ---
 
 export const getBlogPosts = () => {
-    return fetch(`${API_BASE_URL}/api/blog/posteos`).then(handleResponse);
+    return fetch(`${API_BASE_URL}/blog/posteos`).then(handleResponse);
 };
 
 // --- Utilidad (Local) ---
