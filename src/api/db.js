@@ -1,5 +1,3 @@
-// La URL de mi portal (Gateway)
-// Usamos la variable de entorno de Vite (correcta en Vercel)
 const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 // --- Helpers ---
@@ -33,7 +31,8 @@ const getAuthHeaders = () => {
         const storedUser = localStorage.getItem('user');
         if (storedUser) {
             const user = JSON.parse(storedUser);
-            headers['x-user-id'] = user.id;
+            // El header x-user-id es requerido por los microservicios
+            headers['x-user-id'] = user.id; 
         }
     } catch (e) {}
     return headers;
@@ -73,6 +72,7 @@ export const deleteProduct = (id) => {
 };
 
 // --- Login / Registro ---
+// Nota: Estas rutas deben coincidir con la configuración del router en login-service
 
 export const loginUser = ({ email, password }) => {
     return fetch(`${API_BASE_URL}/login/login`, {
@@ -91,6 +91,7 @@ export const registerUser = (userData) => {
 };
 
 // --- Admin Usuarios ---
+// Esta ruta ahora es funcional gracias al proxy en el Gateway
 
 export const getUsers = () => {
     return fetch(`${API_BASE_URL}/users`, {
@@ -114,6 +115,7 @@ export const addUser = ({ email, password }) => {
 };
 
 // --- Carrito ---
+// Rutas corregidas de 'itemlo' a 'items'
 
 export const getCart = () => {
     return fetch(`${API_BASE_URL}/cart`, {
@@ -122,7 +124,8 @@ export const getCart = () => {
 };
 
 export const addToCartApi = (product) => {
-    return fetch(`${API_BASE_URL}/cart/itemlo`, {
+    // RUTA CORREGIDA: Asumiendo que el Cart Service usa /items
+    return fetch(`${API_BASE_URL}/cart/items`, { 
         method: 'POST',
         headers: getAuthHeaders(),
         body: JSON.stringify(product)
@@ -130,7 +133,8 @@ export const addToCartApi = (product) => {
 };
 
 export const removeFromCartApi = (productId) => {
-    return fetch(`${API_BASE_URL}/cart/itemlo/${productId}`, {
+    // RUTA CORREGIDA: Asumiendo que el Cart Service usa /items
+    return fetch(`${API_BASE_URL}/cart/items/${productId}`, {
         method: 'DELETE',
         headers: getAuthHeaders()
     }).then(handleResponse);
